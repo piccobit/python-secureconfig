@@ -3,3 +3,5 @@
 build/
 dist/
 secureconfig.egg-info/
+__pycache__/
+.*.swp
