@@ -25,7 +25,7 @@ oh god multiple inheritance
 
 import sys
 
-from ConfigParser import ConfigParser, NoSectionError, NoOptionError
+from configparser import ConfigParser, NoSectionError, NoOptionError
 
 from .baseclass import CryptKeeperAccessMethods
 
