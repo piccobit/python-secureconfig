@@ -10,18 +10,19 @@ Assume "aspirational" invocation of StorageCryptKeeper unless
 kwargs['proactive'] == False
 (i.e. if supplied file path or env variable doesn't exist, create it.)
 
-FileCryptKeeper will not create a directory, only a file. Target directory must exist.
+FileCryptKeeper will not create a directory, only a file.
+Target directory must exist.
 
-The 'sigil' attribute is being used in SecureConfigParser to distinguish an encrypted
-value from a plaintext value.  It could be used in the future to allow multiple keys
-to encrypt and decrypt values from the same config.
+The 'sigil' attribute is being used in SecureConfigParser to distinguish an
+encrypted value from a plaintext value.  It could be used in the future to
+allow multiple keys to encrypt and decrypt values from the same config.
 
 CryptKeeper is built around cryptography.io which asserts the following
 standards about its "Fernet" protocol:
 
-      * AES in CBC mode with a 128-bit key for encryption; using PKCS7 padding.
-      * HMAC using SHA256 for authentication.
-      * Initialization vectors are generated using os.urandom().
+ * AES in CBC mode with a 128-bit key for encryption; using PKCS7 padding.
+ * HMAC using SHA256 for authentication.
+ * Initialization vectors are generated using os.urandom().
 """
 
 
@@ -38,12 +39,13 @@ def verify_key(key, teststr='test string'):
 
     try:
         enctxt = ck.encrypt(teststr)
-        #print(enctxt)
+        # print(enctxt)
         assert teststr == ck.decrypt(enctxt)
     except Exception as exception:  # pylint: disable=broad-except
         print(exception)
 
     return False
+
 
 class CryptKeeperAccessMethods(object):
     """ Not to be used directly; subclass to make objects with
@@ -135,7 +137,7 @@ class CryptKeeper(object):
         """ Takes plaintext string and returns encrypted string.
         """
 
-        return self.crypter.encrypt(inp)
+        return self.crypter.encrypt(inp.encode())
 
     def decrypt(self, inp):
         """ Takes encrypted string and returns plaintext string.
@@ -154,7 +156,6 @@ class CryptKeeper(object):
         """
 
         return self.key
-
 
 
 class EnvCryptKeeper(CryptKeeper):

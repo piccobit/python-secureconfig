@@ -31,7 +31,8 @@ from .baseclass import CryptKeeperAccessMethods
 
 
 class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
-    """ A subclass of ConfigParser py:class::ConfigParser which decrypts certain entries.
+    """ A subclass of ConfigParser py:class::ConfigParser which decrypts
+    certain entries.
     """
 
     def __init__(self, *args, **kwargs):
@@ -45,7 +46,7 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
         """ Read the list of config files.
         """
 
-        #print("[DEBUG] filenames: ", filenames)
+        # print("[DEBUG] filenames: ", filenames)
         ConfigParser.read(self, filenames)
 
     def raw_get(self, sec, key, default=None):
@@ -54,10 +55,11 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
 
         try:
             return ConfigParser.get(self, sec, key)
-            #return super(SecureConfigParser, self).get(sec, key)
+            # return super(SecureConfigParser, self).get(sec, key)
         except (NoSectionError, NoOptionError):
             return default
-        except Exception as exception:  # pylint: disable=broad-except,unused-variable
+        # pylint: disable=broad-except,unused-variable
+        except Exception as exception:
             print("[DEBUG] {}".format(sys.exc_info()[0]))
 
     def raw_set(self, sec, key, val):
@@ -76,7 +78,8 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
         """ Decrypt supplied value if it appears to be encrypted.
         """
 
-        if self.ck and raw_val.startswith(self.ck.sigil):  # pylint: disable=no-else-return
+        # pylint: disable=no-else-return
+        if self.ck and raw_val.startswith(self.ck.sigil):
             return self.ck.crypter.decrypt(raw_val.split(self.ck.sigil)[1])
         else:
             return raw_val
@@ -95,13 +98,14 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
 
     def set(self, sec, key, new_val, encrypt=False):
         """ If the value should be secured, encrypt and update it;
-            Otherwise just update it.  supply encrypt=True to encrypt
-            a value that was not previously encrypted.
+            Otherwise just update it.
+        Supply encrypt=True to encrypt a value that was not previously
+        encrypted.
         """
 
         if not self.has_option(sec, key):
             if encrypt:
-                new_val = self.ck.sigil + self.ck.encrypt(new_val)
+                new_val = self.ck.sigil + self.ck.encrypt(new_val).decode()
             return self.raw_set(sec, key, new_val)
 
         old_raw_val = self.raw_get(sec, key)
