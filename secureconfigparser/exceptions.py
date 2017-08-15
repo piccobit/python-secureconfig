@@ -1,7 +1,16 @@
+""" SecureConfigExceptions.
+"""
+
 class SecureConfigException(Exception):
-    def __init__(self, message, Errors=[]):
+    """ SecureConfigExceptions.
+    """
+
+    def __init__(self, message, errors=None):
         Exception.__init__(self, message)
-        self.Errors = Errors
+        self.errors = errors
 
 class ReadOnlyConfigError(SecureConfigException):
+    """ Thrown if the configuration is read-only.
+    """
+
     pass
