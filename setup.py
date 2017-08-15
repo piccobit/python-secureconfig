@@ -1,8 +1,5 @@
 from setuptools import setup, find_packages
 
-cmdclass = {}
-ext_modules = []
-
 
 setup(
     name="secureconfigparser",
@@ -14,8 +11,6 @@ setup(
     author_email="naomi@nthmost.net",
     maintainer="HD Stich",
     maintainer_email="hd@stich.io",
-    cmdclass=cmdclass,
-    ext_modules=ext_modules,
     license="MIT",
     zip_safe=True,
     packages=find_packages(),
