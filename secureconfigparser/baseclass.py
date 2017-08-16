@@ -57,7 +57,7 @@ class SecureConfig(CryptKeeperAccessMethods):
 
         self.cfg = {}
         self.readonly = readonly
-        self.ck = kwargs.get('ck', None) # pylint: disable=invalid-name
+        self.ck = kwargs.get('ck', None)  # pylint: disable=invalid-name
 
         if filepath and rawtxt:
             raise SecureConfigException(

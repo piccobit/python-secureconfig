@@ -26,9 +26,22 @@ standards about its "Fernet" protocol:
 """
 
 
+import logging
 import os
+import sys
 
 from cryptography.fernet import Fernet
+
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.setLevel(logging.DEBUG)
+_LOGFORMATTER = logging.Formatter(
+    "%(asctime)s,%(msecs)d %(levelname)-8s [%(threadName)-12.12s] "
+    "[%(filename)s:%(lineno)d] %(message)s")
+_LOGGER.propagate = True
+_CH = logging.StreamHandler(sys.stdout)
+_CH.setFormatter(_LOGFORMATTER)
+_LOGGER.addHandler(_CH)
 
 
 def verify_key(key, teststr='test string'):
@@ -39,10 +52,10 @@ def verify_key(key, teststr='test string'):
 
     try:
         enctxt = ck.encrypt(teststr)
-        # print(enctxt)
+        _LOGGER.debug("enctxt: %s", enctxt)
         assert teststr == ck.decrypt(enctxt)
     except Exception as exception:  # pylint: disable=broad-except
-        print(exception)
+        _LOGGER.debug(exception)
 
     return False
 
