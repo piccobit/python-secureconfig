@@ -1,4 +1,6 @@
-""" SecureConfigParser.
+"""
+
+SecureConfigParser.
 
 SECURECONFIG pattern:
  - allow key retrieval and storage from CryptKeeper object
@@ -21,13 +23,26 @@ until ConfigParser gets its act together.
 
 oh god multiple inheritance
 /me crosses her fingers
+
 """
 
+import logging
 import sys
 
 from configparser import ConfigParser, NoSectionError, NoOptionError
 
 from .baseclass import CryptKeeperAccessMethods
+
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.setLevel(logging.DEBUG)
+_LOGFORMATTER = logging.Formatter(
+    "%(asctime)s,%(msecs)d %(levelname)-8s [%(threadName)-12.12s] "
+    "[%(filename)s:%(lineno)d] %(message)s")
+_LOGGER.propagate = True
+_CH = logging.StreamHandler(sys.stdout)
+_CH.setFormatter(_LOGFORMATTER)
+_LOGGER.addHandler(_CH)
 
 
 class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
@@ -46,21 +61,23 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
         """ Read the list of config files.
         """
 
-        # print("[DEBUG] filenames: ", filenames)
+        _LOGGER.debug("filenames: %s", filenames)
         ConfigParser.read(self, filenames)
 
     def raw_get(self, sec, key, default=None):
         """ Get the raw value without decoding it.
         """
 
+        _LOGGER.debug("sec: %s, key: %s", sec, key)
+
         try:
-            return ConfigParser.get(self, sec, key)
+            return ConfigParser.get(self, sec, key, raw=True)
             # return super(SecureConfigParser, self).get(sec, key)
         except (NoSectionError, NoOptionError):
             return default
         # pylint: disable=broad-except,unused-variable
         except Exception as exception:
-            print("[DEBUG] {}".format(sys.exc_info()[0]))
+            _LOGGER.debug("%s", exception)
 
     def raw_set(self, sec, key, val):
         """ Set the value without encrypting it.
@@ -80,7 +97,8 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
 
         # pylint: disable=no-else-return
         if self.ck and raw_val.startswith(self.ck.sigil):
-            return self.ck.crypter.decrypt(raw_val.split(self.ck.sigil)[1])
+            return self.ck.crypter.decrypt(
+                raw_val.split(self.ck.sigil)[1].encode())
         else:
             return raw_val
 
@@ -111,7 +129,7 @@ class SecureConfigParser(ConfigParser, CryptKeeperAccessMethods):
         old_raw_val = self.raw_get(sec, key)
 
         if old_raw_val.startswith(self.ck.sigil) or encrypt:
-            new_val = self.ck.sigil + self.ck.encrypt(new_val)
+            new_val = self.ck.sigil + self.ck.encrypt(new_val).decode()
             return self.raw_set(sec, key, new_val)
 
         return self.raw_set(sec, key, new_val)
